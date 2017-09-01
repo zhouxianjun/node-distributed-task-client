@@ -55,7 +55,7 @@ var JobStruct = module.exports.JobStruct = function(args) {
       throw new Thrift.TProtocolException(Thrift.TProtocolExceptionType.UNKNOWN, 'Required field action is unset!');
     }
     if (args.params !== undefined && args.params !== null) {
-      this.params = Thrift.copyMap(args.params, [null]);
+      this.params = args.params;
     }
     if (args.feedback !== undefined && args.feedback !== null) {
       this.feedback = args.feedback;
@@ -144,25 +144,8 @@ JobStruct.prototype.read = function(input) {
       }
       break;
       case 8:
-      if (ftype == Thrift.Type.MAP) {
-        var _size0 = 0;
-        var _rtmp34;
-        this.params = {};
-        var _ktype1 = 0;
-        var _vtype2 = 0;
-        _rtmp34 = input.readMapBegin();
-        _ktype1 = _rtmp34.ktype;
-        _vtype2 = _rtmp34.vtype;
-        _size0 = _rtmp34.size;
-        for (var _i5 = 0; _i5 < _size0; ++_i5)
-        {
-          var key6 = null;
-          var val7 = null;
-          key6 = input.readString();
-          val7 = input.readString();
-          this.params[key6] = val7;
-        }
-        input.readMapEnd();
+      if (ftype == Thrift.Type.STRING) {
+        this.params = input.readString();
       } else {
         input.skip(ftype);
       }
@@ -265,18 +248,8 @@ JobStruct.prototype.write = function(output) {
     output.writeFieldEnd();
   }
   if (this.params !== null && this.params !== undefined) {
-    output.writeFieldBegin('params', Thrift.Type.MAP, 8);
-    output.writeMapBegin(Thrift.Type.STRING, Thrift.Type.STRING, Thrift.objectLength(this.params));
-    for (var kiter8 in this.params)
-    {
-      if (this.params.hasOwnProperty(kiter8))
-      {
-        var viter9 = this.params[kiter8];
-        output.writeString(kiter8);
-        output.writeString(viter9);
-      }
-    }
-    output.writeMapEnd();
+    output.writeFieldBegin('params', Thrift.Type.STRING, 8);
+    output.writeString(this.params);
     output.writeFieldEnd();
   }
   if (this.feedback !== null && this.feedback !== undefined) {
@@ -474,6 +447,75 @@ HostInfo.prototype.write = function(output) {
   if (this.pid !== null && this.pid !== undefined) {
     output.writeFieldBegin('pid', Thrift.Type.I32, 3);
     output.writeI32(this.pid);
+    output.writeFieldEnd();
+  }
+  output.writeFieldStop();
+  output.writeStructEnd();
+  return;
+};
+
+var ExecuteResult = module.exports.ExecuteResult = function(args) {
+  this.msg = null;
+  this.info = null;
+  if (args) {
+    if (args.msg !== undefined && args.msg !== null) {
+      this.msg = args.msg;
+    }
+    if (args.info !== undefined && args.info !== null) {
+      this.info = new ttypes.HostInfo(args.info);
+    } else {
+      throw new Thrift.TProtocolException(Thrift.TProtocolExceptionType.UNKNOWN, 'Required field info is unset!');
+    }
+  }
+};
+ExecuteResult.prototype = {};
+ExecuteResult.prototype.read = function(input) {
+  input.readStructBegin();
+  while (true)
+  {
+    var ret = input.readFieldBegin();
+    var fname = ret.fname;
+    var ftype = ret.ftype;
+    var fid = ret.fid;
+    if (ftype == Thrift.Type.STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+      if (ftype == Thrift.Type.STRING) {
+        this.msg = input.readString();
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      case 2:
+      if (ftype == Thrift.Type.STRUCT) {
+        this.info = new ttypes.HostInfo();
+        this.info.read(input);
+      } else {
+        input.skip(ftype);
+      }
+      break;
+      default:
+        input.skip(ftype);
+    }
+    input.readFieldEnd();
+  }
+  input.readStructEnd();
+  return;
+};
+
+ExecuteResult.prototype.write = function(output) {
+  output.writeStructBegin('ExecuteResult');
+  if (this.msg !== null && this.msg !== undefined) {
+    output.writeFieldBegin('msg', Thrift.Type.STRING, 1);
+    output.writeString(this.msg);
+    output.writeFieldEnd();
+  }
+  if (this.info !== null && this.info !== undefined) {
+    output.writeFieldBegin('info', Thrift.Type.STRUCT, 2);
+    this.info.write(output);
     output.writeFieldEnd();
   }
   output.writeFieldStop();
