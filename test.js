@@ -4,11 +4,16 @@ const zookeeper = require('node-zookeeper-client');
 let zk = zookeeper.createClient('127.0.0.1:2181');
 zk.connect();
 Client.instance(zk, 'test');
-Client.instance().addJob({
-    taskId: "2222",
+Client.instance().addJobs([{
+    taskId: "list-1",
     type: 'CRON',
-    cron: '*/2 * * * *',
+    cron: '*/5 * * * *',
     action: 'say'
-}).catch(err => {
+}, {
+    taskId: "list-2",
+    type: 'CRON',
+    cron: '*/8 * * * *',
+    action: 'say'
+}]).catch(err => {
     console.log(err.stack);
 });

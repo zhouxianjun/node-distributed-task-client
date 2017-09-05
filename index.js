@@ -30,11 +30,11 @@ class Client {
 
         setInterval(async () => {
             try {
-                let jobs = await this.failStore.jobs();
-                jobs.forEach(async job => {
-                    logger.info(`delete fail store job ${job.taskId}`);
-                    await this.failStore.del(job);
-                    await this.addJob(job);
+                let datas = await this.failStore.datas();
+                datas.forEach(async data => {
+                    logger.info(`delete fail store job ${data.key}`);
+                    await this.failStore.del(data.key);
+                    await this.addJobs(data.value);
                 });
             } catch (err) {
                 logger.warn(`fail store retry error`, err);
@@ -59,6 +59,25 @@ class Client {
         } catch (e) {
             await this.failStore.put(job);
             logger.error(`job ${job.taskId} add fail, save local store`, e);
+        }
+    }
+
+    async addJobs(jobs) {
+        if (!Array.isArray(jobs)) return await this.addJob(jobs);
+        if (Array.isArray(jobs) && jobs.length === 1) return await this.addJob(jobs[0]);
+        let data = [];
+        jobs.forEach(job => {
+            job.nodeGroup = this.group;
+            job.submitHost = this.host;
+            job.submitPid = process.pid;
+            data.push(new PublicStruct.JobStruct(job));
+        });
+        let jobService = await this.getService();
+        try {
+            await jobService.addList(data);
+        } catch (e) {
+            await this.failStore.put(null, data);
+            logger.error(`jobs add fail, save local store`, e);
         }
     }
 

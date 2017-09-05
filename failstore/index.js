@@ -8,15 +8,15 @@ class FailStore {
         mkdirp.sync(this.dir);
     }
 
-    async jobs() {
+    async datas() {
         throw new Error(`this is interface function`);
     }
 
-    async put(job) {
+    async put(key, val) {
         throw new Error(`this is interface function`);
     }
 
-    async del(job) {
+    async del(key) {
         throw new Error(`this is interface function`);
     }
 }
